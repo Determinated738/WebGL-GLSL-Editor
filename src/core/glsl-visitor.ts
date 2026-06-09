@@ -359,23 +359,26 @@ export class GlslVisitor extends AbstractParseTreeVisitor<void> implements Antlr
         Helper.addFoldingRegionFromTokens(this.di, ctx.start, ctx.stop, -1);
 
         const labels = ctx.case_label();
-        const firstLabel = labels[0];
-        const lastLabel = labels[labels.length - 1];
+        if (labels.length > 0) {
+            const firstLabel = labels[0];
+            const lastLabel = labels[labels.length - 1];
 
-        this.di
-            .getRegions()
-            .caseHeaderRegions.push(new Interval(firstLabel.start.startIndex, lastLabel.stop.stopIndex + 1, this.di));
+            this.di
+                .getRegions()
+                .caseHeaderRegions.push(
+                    new Interval(firstLabel.start.startIndex, lastLabel.stop.stopIndex + 1, this.di)
+                );
+        }
 
         const statements = ctx.statement();
         if (statements.length > 0 && statements[0].simple_statement()) {
+            const firstStmt = statements[0];
+            const lastStmt = statements[statements.length - 1];
+
             this.di
                 .getRegions()
                 .caseStatementsRegions.push(
-                    new Interval(
-                        statements[0].start.startIndex,
-                        statements[statements.length - 1].stop.stopIndex + 1,
-                        this.di
-                    )
+                    new Interval(firstStmt.start.startIndex, lastStmt.stop.stopIndex + 1, this.di)
                 );
         }
         this.visitChildren(ctx);
