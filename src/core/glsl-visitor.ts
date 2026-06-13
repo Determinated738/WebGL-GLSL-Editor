@@ -356,29 +356,25 @@ export class GlslVisitor extends AbstractParseTreeVisitor<void> implements Antlr
     }
 
     public visitCase_group(ctx: Case_groupContext): void {
-        Helper.addFoldingRegionFromTokens(this.di, ctx.start, ctx.stop, -1);
-
         const labels = ctx.case_label();
-        if (labels.length > 0) {
-            const firstLabel = labels[0];
-            const lastLabel = labels[labels.length - 1];
+        const firstLabel = labels[0];
+        const lastLabel = labels[labels.length - 1];
 
-            this.di
-                .getRegions()
-                .caseHeaderRegions.push(
-                    new Interval(firstLabel.start.startIndex, lastLabel.stop.stopIndex + 1, this.di)
-                );
-        }
+        Helper.addFoldingRegionFromTokens(this.di, lastLabel.start, ctx.stop, -1);
+
+        this.di
+            .getRegions()
+            .caseHeaderRegions.push(new Interval(firstLabel.start.startIndex, lastLabel.stop.stopIndex + 1, this.di));
 
         const statements = ctx.statement();
-        if (statements.length > 0 && statements[0].simple_statement()) {
-            const firstStmt = statements[0];
-            const lastStmt = statements[statements.length - 1];
+        if (statements.length > 0) {
+            const firstStatement = statements[0];
+            const lastStatement = statements[statements.length - 1];
 
             this.di
                 .getRegions()
                 .caseStatementsRegions.push(
-                    new Interval(firstStmt.start.startIndex, lastStmt.stop.stopIndex + 1, this.di)
+                    new Interval(firstStatement.start.startIndex, lastStatement.stop.stopIndex + 1, this.di)
                 );
         }
         this.visitChildren(ctx);
